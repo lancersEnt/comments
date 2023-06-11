@@ -1,0 +1,52 @@
+extend schema
+  @link(url: "https://specs.apollo.dev/federation/v2.3",
+        import: ["@key", "@shareable","@external"])
+
+directive @key(fields: String!) on OBJECT | INTERFACE
+
+directive @external on OBJECT | FIELD_DEFINITION
+
+scalar DateTime
+
+type Post @key(fields: "id"){
+  id: ID!
+  comments: [Comment!]
+}
+
+type Comment @key(fields: "id"){
+  # Example field (placeholder)
+  id: ID!
+  content: String!
+  authorId: String!
+  postId: String!
+  post: Post
+  createdAt: DateTime
+  updatedAt: DateTime
+
+}
+
+input CreateCommentInput {
+  # Example field (placeholder)
+  content: String!
+  authorId: String!
+  postId: String
+  createdAt: DateTime
+}
+
+input UpdateCommentInput {
+  content: String
+  authorId: String
+  postId: String
+  updatedAt: DateTime
+}
+
+extend type Query {
+  comments: [Comment]!
+  comment(id: String!): Comment
+}
+
+type Mutation {
+  createComment(createCommentInput: CreateCommentInput!): Comment!
+  updateComment(id: String!, updateCommentInput: UpdateCommentInput!): Comment!
+  removeComment(id: String!): Comment!
+}

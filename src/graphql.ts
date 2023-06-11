@@ -1,3 +1,4 @@
+
 /*
  * -------------------------------------------------------
  * THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
@@ -26,12 +27,18 @@ export class Post {
     comments?: Nullable<Comment[]>;
 }
 
+export class User {
+    id: string;
+    comments?: Nullable<Comment[]>;
+}
+
 export class Comment {
     id: string;
     content: string;
     authorId: string;
     postId: string;
     post?: Nullable<Post>;
+    user?: Nullable<User>;
     createdAt?: Nullable<DateTime>;
     updatedAt?: Nullable<DateTime>;
 }

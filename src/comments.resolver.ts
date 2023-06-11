@@ -8,7 +8,7 @@ import {
 } from '@nestjs/graphql';
 import { CommentsService } from './comments.service';
 import { Prisma } from '@prisma/client';
-import { Comment, Post } from './graphql';
+import { Comment, Post, User } from './graphql';
 
 @Resolver('Comment')
 export class CommentsResolver {
@@ -47,5 +47,10 @@ export class CommentsResolver {
   @ResolveField(() => Post)
   post(@Parent() comment: Comment) {
     return { __typename: 'Post', id: comment.postId };
+  }
+
+  @ResolveField(() => User)
+  user(@Parent() comment: Comment) {
+    return { __typename: 'User', id: comment.authorId };
   }
 }

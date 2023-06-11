@@ -13,6 +13,11 @@ type Post @key(fields: "id"){
   comments: [Comment!]
 }
 
+type User @key(fields: "id"){
+  id: ID! 
+  comments: [Comment!]
+}
+
 type Comment @key(fields: "id"){
   # Example field (placeholder)
   id: ID!
@@ -20,6 +25,7 @@ type Comment @key(fields: "id"){
   authorId: String!
   postId: String!
   post: Post
+  user: User
   createdAt: DateTime
   updatedAt: DateTime
 

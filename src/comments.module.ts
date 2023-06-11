@@ -9,6 +9,7 @@ import {
 import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin/landingPage/default';
 import { PrismaService } from 'prisma/prisma.service';
 import { PostsResolver } from './posts.resolver';
+import { UsersResolver } from './users.resolver';
 
 @Module({
   imports: [
@@ -22,6 +23,12 @@ import { PostsResolver } from './posts.resolver';
       },
     }),
   ],
-  providers: [PrismaService, CommentsResolver, CommentsService, PostsResolver],
+  providers: [
+    PrismaService,
+    CommentsResolver,
+    CommentsService,
+    PostsResolver,
+    UsersResolver,
+  ],
 })
 export class CommentsModule {}

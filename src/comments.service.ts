@@ -49,4 +49,11 @@ export class CommentsService {
       },
     });
   }
+  forUser(authorId: string) {
+    return this.prisma.comment.findMany({
+      where: {
+        authorId: authorId,
+      },
+    });
+  }
 }

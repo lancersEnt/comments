@@ -22,16 +22,6 @@ export class UpdateCommentInput {
     updatedAt?: Nullable<DateTime>;
 }
 
-export class Post {
-    id: string;
-    comments?: Nullable<Comment[]>;
-}
-
-export class User {
-    id: string;
-    comments?: Nullable<Comment[]>;
-}
-
 export class Comment {
     id: string;
     content: string;
@@ -55,6 +45,16 @@ export abstract class IMutation {
     abstract updateComment(id: string, updateCommentInput: UpdateCommentInput): Comment | Promise<Comment>;
 
     abstract removeComment(id: string): Comment | Promise<Comment>;
+}
+
+export class Post {
+    id: string;
+    comments?: Nullable<Comment[]>;
+}
+
+export class User {
+    id: string;
+    comments?: Nullable<Comment[]>;
 }
 
 export type DateTime = any;

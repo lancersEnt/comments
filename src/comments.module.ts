@@ -10,6 +10,7 @@ import { ApolloServerPluginLandingPageLocalDefault } from '@apollo/server/plugin
 import { PrismaService } from 'prisma/prisma.service';
 import { PostsResolver } from './posts.resolver';
 import { UsersResolver } from './users.resolver';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import { UsersResolver } from './users.resolver';
         DateTime: GraphQLISODateTime,
       },
     }),
+    AuthModule,
   ],
   providers: [
     PrismaService,

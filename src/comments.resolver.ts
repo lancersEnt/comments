@@ -5,19 +5,27 @@ import {
   Args,
   Parent,
   ResolveField,
+  Context,
 } from '@nestjs/graphql';
 import { CommentsService } from './comments.service';
 import { Prisma } from '@prisma/client';
 import { Comment, Post, User } from './graphql';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 @Resolver('Comment')
+@UseGuards(JwtAuthGuard)
 export class CommentsResolver {
   constructor(private readonly commentsService: CommentsService) {}
 
   @Mutation('createComment')
   create(
     @Args('createCommentInput') createCommentInput: Prisma.CommentCreateInput,
+    @Context() context: any,
   ) {
+    const { req: request, res } = context;
+    const userId: string = request.user.userId;
+    createCommentInput.authorId = userId;
     return this.commentsService.create(createCommentInput);
   }
 

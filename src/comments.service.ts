@@ -7,8 +7,6 @@ export class CommentsService {
   constructor(private prisma: PrismaService) {}
 
   create(createCommentInput: Prisma.CommentCreateInput) {
-    const now = new Date().toISOString();
-    createCommentInput.createdAt = now;
     return this.prisma.comment.create({
       data: createCommentInput,
     });
@@ -28,11 +26,9 @@ export class CommentsService {
     commentWhereUniqueInput: Prisma.CommentWhereUniqueInput,
     updateCommentInput: Prisma.CommentUpdateInput,
   ) {
-    const now = new Date().toISOString();
-    updateCommentInput.updatedAt = now;
     return this.prisma.comment.update({
       where: commentWhereUniqueInput,
-      data: updateCommentInput,
+      data: { ...updateCommentInput, updatedAt: new Date().toISOString() },
     });
   }
 

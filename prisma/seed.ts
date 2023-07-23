@@ -11,8 +11,6 @@ async function main() {
       authorId: 'fakroun',
     },
   });
-
-  console.log({ post });
 }
 
 main()

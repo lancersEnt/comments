@@ -1,22 +1,16 @@
-extend schema
-  @link(url: "https://specs.apollo.dev/federation/v2.3",
-        import: ["@key", "@shareable"])
-
-directive @external on OBJECT | FIELD_DEFINITION
-
 scalar DateTime
 
-extend type Post @key(fields: "id"){
+type Post{
   id: ID!
   comments: [Comment!]
 }
 
-extend type User @key(fields: "id"){
-  id: ID!
+type User{
+  id: ID! 
   comments: [Comment!]
 }
 
-type Comment @key(fields: "id"){
+type Comment{
   # Example field (placeholder)
   id: ID!
   content: String!
@@ -24,9 +18,9 @@ type Comment @key(fields: "id"){
   postId: String!
   postOwnerId: String!
   post: Post
-  user: User
   likersIds:[String]
   likers: [User]
+  user: User
   createdAt: DateTime
   updatedAt: DateTime
 
@@ -36,7 +30,7 @@ input CreateCommentInput {
   # Example field (placeholder)
   content: String!
   authorId: String
-  postId: String
+  postId: String  
   postOwnerId: String!
   createdAt: DateTime
 }
@@ -44,12 +38,12 @@ input CreateCommentInput {
 input UpdateCommentInput {
   content: String
   authorId: String
-  postOwnerId: String
   postId: String
+  postOwnerId: String
   updatedAt: DateTime
 }
 
-extend type Query {
+type Query {
   comments: [Comment]!
   postComments (postId: String!): [Comment]!
   comment(id: String!): Comment
@@ -61,4 +55,19 @@ type Mutation {
   removeComment(id: String!): Comment!
   likeComment(commentId:String!):Boolean
   unlikeComment(commentId:String!):Boolean
+
+}
+
+type CommentResult {
+  newComment: Comment
+}
+
+type CommentLikedResult {
+  comment: Comment
+}
+
+type Subscription {
+  commentCreated(postId:String!): CommentResult
+  commentLiked(postId:String!): CommentLikedResult
+  commentUnliked(postId:String!): CommentLikedResult
 }

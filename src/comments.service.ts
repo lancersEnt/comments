@@ -13,8 +13,8 @@ export class CommentsService {
     });
     const newCommentNotif: Notification = {
       payload: {
-        title: 'New comment',
-        body: `${createCommentInput.authorId} has commented on your post`,
+        title: 'Comment Created',
+        body: `${createCommentInput.authorId} a commenté votre publication`,
         createdBy: createCommentInput.authorId,
         targetUserId: createCommentInput.postOwnerId,
       },
@@ -61,7 +61,7 @@ export class CommentsService {
     if (likers.includes(userId)) throw new Error('already liked');
     likers.push(userId);
     try {
-      return await this.prisma.comment.update({
+      const like = await this.prisma.comment.update({
         where: {
           id: commentId,
         },
@@ -69,6 +69,20 @@ export class CommentsService {
           likersIds: likers,
         },
       });
+
+      const CommentLikedNotification: Notification = {
+        payload: {
+          title: 'Comment Liked',
+          body: `${userId} a aimé votre commentaire`,
+          createdBy: userId,
+          targetUserId: comment.authorId,
+        },
+      };
+      this.kafka.produce(
+        'notifications',
+        JSON.stringify(CommentLikedNotification),
+      );
+      return like;
     } catch (error) {
       throw new Error(error.message);
     }

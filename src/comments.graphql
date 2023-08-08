@@ -38,6 +38,7 @@ input CreateCommentInput {
   authorId: String
   postId: String
   postOwnerId: String!
+  postSubscribers: String
   createdAt: DateTime
 }
 

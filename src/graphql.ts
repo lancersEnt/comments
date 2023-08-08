@@ -13,6 +13,7 @@ export class CreateCommentInput {
     authorId?: Nullable<string>;
     postId?: Nullable<string>;
     postOwnerId: string;
+    postSubscribers?: Nullable<string>;
     createdAt?: Nullable<DateTime>;
 }
 

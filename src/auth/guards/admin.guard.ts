@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
+import { AuthenticationError } from 'apollo-server-core';
 import { AuthService } from '../auth.service';
-import { AuthenticationError } from '@nestjs/apollo';
 
 @Injectable()
 export class AdminGuard implements CanActivate {

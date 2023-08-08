@@ -3,6 +3,10 @@ import { PrismaService } from 'prisma/prisma.service';
 import { Prisma } from '@prisma/client';
 import { KafkaService } from './kafka/kafka.service';
 import { Notification } from './utils/interfaces/notification.interface';
+import capitalize from './utils/capitalize';
+import getSender from './utils/getSender';
+import { log } from 'console';
+
 @Injectable()
 export class CommentsService {
   constructor(private prisma: PrismaService, private kafka: KafkaService) {}
@@ -11,15 +15,55 @@ export class CommentsService {
     const comment = await this.prisma.comment.create({
       data: createCommentInput,
     });
+
+    // Publish event to add user to post subscribers
+    if (comment.postOwnerId !== comment.authorId)
+      this.kafka.produce(
+        'posts_subs',
+        JSON.stringify({
+          type: 'subscribe',
+          payload: {
+            id: createCommentInput.authorId,
+            postId: createCommentInput.postId,
+          },
+        }),
+      );
+
+    const sender = await getSender(createCommentInput.authorId);
+
     const newCommentNotif: Notification = {
       payload: {
-        title: 'Comment Created',
-        body: `${createCommentInput.authorId} a commenté votre publication`,
+        title: `Comment Created - ${comment.id}`,
+        body: `${capitalize(sender.firstname)} ${capitalize(
+          sender.lastname,
+        )} a commenté votre publication`,
         createdBy: createCommentInput.authorId,
         targetUserId: createCommentInput.postOwnerId,
+        action: `/publication/${comment.postId}`,
       },
     };
-    this.kafka.produce('notifications', JSON.stringify(newCommentNotif));
+
+    await this.kafka.produce('notifications', JSON.stringify(newCommentNotif));
+    const subs = JSON.parse(createCommentInput.postSubscribers);
+
+    // const subs = Object.values(createCommentInput.postSubscribers);
+    subs.forEach(async (sub) => {
+      const newCommentNotifSubscribers: Notification = {
+        payload: {
+          title: `Comment Created - ${comment.id}`,
+          body: `${capitalize(sender.firstname)} ${capitalize(
+            sender.lastname,
+          )} a commenté une publication que vous suivez`,
+          createdBy: createCommentInput.authorId,
+          targetUserId: sub.id,
+          action: `/publication/${comment.postId}`,
+        },
+      };
+      await this.kafka.produce(
+        'notifications',
+        JSON.stringify(newCommentNotifSubscribers),
+      );
+    });
     return comment;
   }
 
@@ -31,6 +75,9 @@ export class CommentsService {
     return this.prisma.comment.findMany({
       where: {
         postId,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }
@@ -70,12 +117,17 @@ export class CommentsService {
         },
       });
 
+      const sender = await getSender(userId);
+
       const CommentLikedNotification: Notification = {
         payload: {
-          title: 'Comment Liked',
-          body: `${userId} a aimé votre commentaire`,
+          title: `Comment Liked - ${comment.id}`,
+          body: `${capitalize(sender.firstname)} ${
+            sender.lastname
+          } a aimé votre commentaire`,
           createdBy: userId,
           targetUserId: comment.authorId,
+          action: `/publication/${comment.postId}`,
         },
       };
       this.kafka.produce(
@@ -124,6 +176,9 @@ export class CommentsService {
     return this.prisma.comment.findMany({
       where: {
         postId: postId,
+      },
+      orderBy: {
+        createdAt: 'desc',
       },
     });
   }
